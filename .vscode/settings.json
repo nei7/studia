@@ -1,5 +1,5 @@
 {
-    "debug.defaultLaunchConfigurationName": "Run current C file (integrated terminal)",
-    "debug.runInTerminal": true
+    "[c]": {
+        "editor.formatOnSave": true
+    }
 }
-  
