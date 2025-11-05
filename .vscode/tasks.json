@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "build-c-current-file",
+        "type": "shell",
+        "command": "bash",
+        "args": [
+          "-c",
+          "mkdir -p \"${workspaceFolder}/build\" && gcc -g \"${file}\" -o \"${workspaceFolder}/build/${fileBasenameNoExtension}\""
+        ],
+        "options": { "cwd": "${workspaceFolder}" },
+        "group": { "kind": "build", "isDefault": true },
+        "problemMatcher": ["$gcc"]
+      },
+  
+      {
+        "label": "build-c-project",
+        "type": "shell",
+        "command": "bash",
+        "args": [
+          "-c",
+          "mkdir -p \"${workspaceFolder}/build\" && gcc -g ${workspaceFolder}/*.c -o \"${workspaceFolder}/build/program\""
+        ],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": ["$gcc"]
+      }
+    ]
+  }
+  
