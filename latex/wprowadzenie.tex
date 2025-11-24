@@ -1,0 +1,176 @@
+\documentclass[12pt,twoside]{book}
+
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\author{Franciszek Szarek}
+\title{Skład tekstu w praktyce}
+\date{}
+
+\begin{document}
+\tableofcontents   
+\listoffigures      
+\listoftables        
+
+\newpage 
+
+\chapter{Wprowadzenie}
+\section{Cel książki}
+\lipsum[1-2]
+
+\section{Zakres tematyczny}
+\lipsum[3-4]
+
+\section{Krój pisma}
+
+\textbf{ To jest tekst pogrubiony. } \\
+\textit{To jest tekst pochylony.} \\ 
+\textsl{To jest tekst napisany kursywą.} \\
+\underline{To jest tekst podkreślony.} \\
+\verb!To jest tekst zapisany jako maszynopis.! \\
+{ \huge To jest tekst większą czcionką.} \\
+\small{To jest tekst mniejszą czcionką.} \\
+
+
+\chapter{Srodowisko}
+\section{Zdefiniować wyliczenie}
+\begin{enumerate}
+\item pierwszy krok
+\item drugi krok
+\item trzeci krok
+\end{enumerate}
+
+\section{Wypunktowanie}
+\begin{itemize}
+\item opcja A
+\item opcja B
+\end{itemize}
+
+\section{Zdefiniować środowsko rysunku wyrównanego}
+\begin{figure}[h!]
+    \includegraphics[width=0.5\textwidth]{obrazek.jpg}
+\end{figure}
+
+\section{Tabela}
+\begin{table}[H]
+    \centering
+    \caption{Przykładowa tabela 3x5}
+    \label{tab:przykladowa_tabela}
+    \begin{tabular}{c c c}
+        Nagłówek 1 & Nagłówek 2 & Nagłówek 3 \\
+        \hline
+        A & B & C \\
+        D & E & F \\
+        G & H & I \\
+        J & K & L \\
+        M & N & O \\
+    \end{tabular}
+\end{table}
+
+\section{}
+\begin{table}[h]
+    \centering
+    \caption{Sinus kata}
+    \label{tab:dsfs}
+    \begin{tabular}{c c c}
+        naglowek & naglowek & naglowek \\
+        \hline
+        kat & 12 & 1231 \\ 
+        sin & 0.5 & 0.866 \\ 
+    \end{tabular}
+\end{table}
+
+
+\chapter{Wzory matematyczne}
+\section{Wzór na pole koła}
+\begin{equation}
+   P = \pi r^2
+\label{eq:pole_kola}
+\end{equation}
+
+\section{Wzór na wyróżnik trójmianu kwadratowego oraz jego miejsca zerowe}
+\begin{equation}
+    \Delta = b^2 - 4ac
+    \label{eq:delta}
+\end{equation}
+
+\begin{equation}
+    x_1 = \frac{-b - \sqrt{\Delta}}{2a}
+    \label{eq:x1}
+\end{equation}
+
+\begin{equation}
+    x_2 = \frac{-b + \sqrt{\Delta}}{2a}
+    \label{eq:x2}
+\end{equation}
+
+\chapter{Odwołania}
+\section{Zdania z odwołaniami do etykiet}
+Rysunek \ref{fig:przykladowy_rysunek},
+Tabela \ref{tab:przykladowa_tabela} Pole koła \ref{eq:pole_kola}
+
+
+\section{Przypis dolny}
+Przypis dolny\footnote{Przypis dolny}. adsfsd
+
+\section{Znaki specjalne}
+\$, \#, \%, \^{ }, \&, \"{ }, \[ \], \textbackslash, \~{ }. \{ \}. \textbar{}. \_ @,
+
+\chapter{Rysunki w PGF/TikZ}
+\section{}
+\begin{figure}[!htp]
+\centering
+\begin{tikzpicture}[node distance=1.25cm,main/.style = {draw, circle}]
+\node[main] (1) {a};
+\node[main] (2) [below right of=1] {b};
+\node[main] (3) [above right of=1] {c};
+\node[main,draw=none] (4) [right of=3] {~};
+\draw[->] (1) to (2);
+\draw[->,color=green] (1) to (3);
+\draw[->,dashed,color=blue] (3) to (4);
+\end{tikzpicture}
+\end{figure}
+
+\section{}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+
+        \node[draw, circle] (a) at (0,0) {a};
+        \node[draw, circle] (c) at (1.5, 1) {c};
+        \node[draw, circle] (b) at (1.5, -1) {b};
+
+
+
+        \node[draw, circle] (delta) at (5, 0) {$\Delta$};
+        \node[draw, circle] (z) at (7, -1) {z};
+
+
+        \draw[->, color=green] (a) -- (c);     
+        \draw[->] (a) -- (b);                 
+        
+        \draw[->] (c) -- (delta); 
+
+
+        \draw[->, dotted] (a) -- (delta);
+        
+        \draw[->] (b) -- (delta);
+        
+        \draw[->, color=red] (b) -- (z);
+        
+        \draw[->, color=red] (z) -- (delta);
+        \draw[->, dashed, color=blue] (c) -- +(1.0, 0);
+
+    \end{tikzpicture}
+    \caption{Końcowy graf do samodzielnego utworzenia}
+\end{figure}
+
+
+
+\end{document}
