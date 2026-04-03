@@ -1,0 +1,36 @@
+\ProvidesPackage{main}
+
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\abovedisplayskip}{15pt}
+\setlength{\belowdisplayskip}{15pt}
+\graphicspath{{assets/}}
+
+\newcommand{\nrprojektu}[1]{\def\@nrprojektu{1}}
+\makeatletter
+\renewcommand{\maketitle}{
+    \begin{titlepage}
+        \begin{center}
+            \hspace{0pt}\\
+            \vspace{4cm}
+            {\Large\bfseries \@author}\\[5pt] 
+
+            \vspace{3cm}
+            {\scalebox{2}{\Huge\bfseries Projekt nr \@nrprojektu}}\\
+            \vspace{0.8cm}
+            {\LARGE\bfseries \@title}\\[10pt]
+
+            \vfill
+            Metody Numeryczne \\
+            \@date 
+        \end{center}
+    \end{titlepage}
+    
+    \setcounter{page}{1}
+}
+\makeatother

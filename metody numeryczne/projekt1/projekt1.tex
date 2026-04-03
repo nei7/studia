@@ -1,0 +1,214 @@
+\documentclass[a4paper,12pt]{scrartcl}
+\usepackage{../main}
+
+\title{Numeryczne wyznaczanie pochodnej funkcji oraz analiza błędu przybliżenia}
+\author{Franciszek Szarek}
+\nrprojektu{1} 
+\date{\today}
+
+\author{Franciszek Szarek}
+
+\begin{document}
+\begin{titlepage}
+
+    \begin{center}
+        \hspace{0pt}\\
+        \vspace{4cm}
+        {\Large\bfseries Franciszek Szarek}\\[5pt]
+
+        \vspace{3cm}
+        {\scalebox{2}{\Huge\bfseries Projekt nr. 1}}\\
+        \vspace{0.8cm}
+        {\LARGE\bfseries Numeryczne wyznaczanie pochodnej funkcji oraz analiza błędu przybliżenia}\\[10pt]
+
+        \vfill
+        Metody Numeryczne \\
+        \today
+    \end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section*{Wstęp teoretyczny}
+Z definicji analizy matematycznej, pochodna funkcji jest granicą ilorazu różnicowego:
+\begin{equation*}
+    \frac{du}{dx} = \lim_{x_2 \to x_1} \frac{u_2 - u_1}{x_2 - x_1}
+\end{equation*}
+Ponieważ systemy komputerowe nie są w stanie operować na pojęciu granicy dążącej do zera, w metodach numerycznych odstępuje się od przejścia granicznego na rzecz stałego, dyskretnego kroku siatki $h = x_2 - x_1$. Wymusza to zamianę dokładnego znaku równości na znak przybliżenia ($\approx$), co z kolei prowadzi do powstania błędu numerycznego, który jest przedmiotem analizy w niniejszym projekcie. Oszacowanie tego błędu opiera się na rozwinięciu funkcji w szereg Taylora.
+
+\section{Wykres funkcji}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_sinh.png}
+    \caption{Wykres funkcji $u(x) = \sinh(x)$ na przedziale $[-1, 1]$.}
+    \label{fig:wykres_sinh}
+\end{figure}
+
+\newpage
+
+\section{Dyskretyzacja przedziału}
+
+W celu numerycznego wyznaczenia pochodnych, ciągłą dziedzinę funkcji
+$u(x) = \sinh(x)$, określoną na przedziale $[-1, 1]$, poddano procesowi dyskretyzacji.
+Do obliczeń przyjęto siatkę równomierną składającą się z $n = 8$ węzłów.
+W pierwszej kolejności wyznaczono stały krok siatki $h$, określający
+odległość pomiędzy sąsiadującymi węzłami. Wykorzystano w tym celu zależność:
+
+\begin{equation*}
+    h = \frac{x_n - x_1}{n - 1}
+\end{equation*}
+
+Podstawiając granice przedziału ($x_1 = -1$, $x_n = 1$) oraz wybraną liczbę węzłów ($n = 8$),
+otrzymano:
+
+\begin{equation*}
+    h = \frac{1 - (-1)}{8 - 1} = \frac{2}{7} \approx 0.2857
+\end{equation*}
+
+Następnie wygenerowano zbiór węzłów $\{x_{\nu}\}$ dla $\nu = 1, 2, \dots, n$,
+korzystając z jawnego wzoru na kolejne punkty siatki:
+
+\begin{equation*}
+    x_{\nu} = x_1 + (\nu - 1)h
+\end{equation*}
+
+Dla przyjętych założeń zbiór ten przyjmuje następujące dokładne wartości (w postaci ułamków zwykłych, aby uniknąć błędu zaokrągleń na etapie tworzenia siatki):
+
+\begin{equation*}
+    \{x_{\nu}\} = \left\{ -1,\; -\frac{5}{7},\; -\frac{3}{7},\; -\frac{1}{7},\; \frac{1}{7},\; \frac{3}{7},\; \frac{5}{7},\; 1 \right\}
+\end{equation*}
+
+Każdemu z wyznaczonych węzłów przyporządkowano odpowiadającą mu dyskretną wartość funkcji $\{u_{\nu}\}$, określoną wzorem:
+
+\begin{equation*}
+    u_{\nu} = \sinh(x_{\nu})
+\end{equation*}
+
+Tak zdefiniowana siatka punktów $\{x_{\nu}, u_{\nu}\}$ stanowi punkt wyjścia do przybliżania wartości pochodnej funkcji w tych węzłach za pomocą ilorazów różnicowych.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_sinh_wezly.png}
+    \caption{Wykres funkcji $u(x) = \sinh(x)$ na przedziale $[-1, 1]$ z zaznaczonymi węzłami z dyskretyzacji.}
+    \label{fig:wykres_sinh_wezly}
+\end{figure}
+
+\newpage
+
+\section{Ilorazy różnicowe pierwszego rzędu}
+Komputerowe wyznaczanie pochodnych funkcji ciągłych wymaga zastosowania metod przybliżonych. Podstawowym narzędziem do tego służącym są ilorazy różnicowe, wyprowadzane na podstawie rozwinięcia funkcji w szereg Taylora z pominięciem reszty $R_n$ (tzw. błąd obcięcia).
+
+Przybliżenie pierwszej pochodnej $u'(x)$ w zdefiniowanych wcześniej węzłach siatki $\{x_{\nu}\}$ zrealizowano za pomocą trzech typów ilorazów różnicowych:
+
+\subsection{Iloraz różnicowy progresywny (w przód)}
+Do przybliżenia pochodnej w węźle $x_{\nu}$ wykorzystywana jest wartość funkcji w tym węźle oraz w węźle następnym ($x_{\nu+1}$). Wzór analityczny przyjmuje postać:
+\begin{equation*}
+    \nabla^1 u_{\nu} = \frac{u_{\nu+1} - u_{\nu}}{h}
+\end{equation*}
+
+\subsection{Iloraz różnicowy regresywny (wstecz)}
+Do przybliżenia pochodnej w węźle $x_{\nu}$ wykorzystywana jest wartość funkcji w tym węźle oraz w węźle poprzednim ($x_{\nu-1}$). Wzór analityczny przyjmuje postać:
+\begin{equation*}
+    \Delta^1 u_{\nu} = \frac{u_{\nu} - u_{\nu-1}}{h}
+\end{equation*}
+
+\subsection{Iloraz różnicowy centralny}
+Metoda ta wykorzystuje wartości funkcji w węźle następnym ($x_{\nu+1}$) oraz poprzednim ($x_{\nu-1}$), pomijając wartość w węźle, dla którego obliczana jest pochodna. Metoda centralna charakteryzuje się wyższym rzędem dokładności. Wzór przyjmuje postać:
+\begin{equation*}
+    \delta^1 u_{\nu} = \frac{u_{\nu+1} - u_{\nu-1}}{2h}
+\end{equation*}
+
+\subsection{Uwaga dotycząca implementacji numerycznej:}
+Ze względu na konstrukcję powyższych wzorów, nie jest możliwe wyznaczenie pochodnych we wszystkich węzłach dla każdego z ilorazów. Pochodnej progresywnej nie można obliczyć dla ostatniego węzła $x_n$ (brak węzła $x_{n+1}$), pochodnej regresywnej dla węzła pierwszego $x_1$ (brak węzła $x_0$), natomiast pochodna centralna nie może zostać obliczona w obu węzłach brzegowych ($x_1$ oraz $x_n$).
+
+
+\subsection{Wyprowadzenie ilorazów różnicowych z szeregu Taylora}
+Podstawą do numerycznego wyznaczania pochodnych jest rozwinięcie badanej funkcji w szereg Taylora w otoczeniu węzła $x_{\nu}$. Zakładając stały krok siatki $h$, rozwinięcie funkcji dla węzła następnego ($x_{\nu+1} = x_{\nu} + h$) oraz poprzedniego ($x_{\nu-1} = x_{\nu} - h$) przyjmuje odpowiednio postać:
+
+\begin{equation*}
+    u_{\nu+1} = u_{\nu} + \frac{h}{1!}u'_{\nu} + \frac{h^2}{2!}u''_{\nu} + \frac{h^3}{3!}u'''_{\nu} + \dots + R_n
+\end{equation*}
+
+\begin{equation*}
+    u_{\nu-1} = u_{\nu} - \frac{h}{1!}u'_{\nu} + \frac{h^2}{2!}u''_{\nu} - \frac{h^3}{3!}u'''_{\nu} + \dots + R_n
+\end{equation*}
+
+Gdzie $R_n$ oznacza resztę szeregu (błąd obcięcia).
+
+\subsubsection{Wyprowadzenie ilorazu progresywnego}
+Aby uzyskać wzór na pochodną progresywną, przekształcamy pierwsze równanie, wyznaczając z niego pierwszą pochodną $u'_{\nu}$:
+\begin{equation*}
+    h u'_{\nu} = u_{\nu+1} - u_{\nu} - \frac{h^2}{2!}u''_{\nu} - \dots
+\end{equation*}
+
+Dzieląc obustronnie przez krok $h$ oraz pomijając wyrażenia wyższych rzędów (resztę), otrzymujemy ostateczny wzór na iloraz różnicowy progresywny:
+\begin{equation*}
+    \nabla^1 u_{\nu} = \frac{u_{\nu+1} - u_{\nu}}{h}
+\end{equation*}
+
+\subsubsection{Wyprowadzenie ilorazu regresywnego}
+Analogicznie, przekształcamy drugie równanie szeregu Taylora (dla węzła poprzedniego), izolując $u'_{\nu}$:
+\begin{equation*}
+    h u'_{\nu} = u_{\nu} - u_{\nu-1} + \frac{h^2}{2!}u''_{\nu} - \dots
+\end{equation*}
+
+Po podzieleniu przez $h$ i odrzuceniu błędu obcięcia, uzyskujemy iloraz różnicowy regresywny:
+\begin{equation*}
+    \Delta^1 u_{\nu} = \frac{u_{\nu} - u_{\nu-1}}{h}
+\end{equation*}
+
+\subsubsection{Wyprowadzenie ilorazu centralnego}
+Aby uzyskać iloraz centralny (charakteryzujący się wyższą dokładnością), odejmujemy drugie równanie szeregu Taylora od równania pierwszego:
+\begin{equation*}
+    u_{\nu+1} - u_{\nu-1} = 2h u'_{\nu} + 2\frac{h^3}{3!}u'''_{\nu} + \dots
+\end{equation*}
+
+Zauważamy, że parzyste potęgi kroku $h$ (np. $h^2$) ulegają redukcji. Wyznaczając szukaną pochodną $u'_{\nu}$, dzieląc obustronnie przez $2h$ i ucinając resztę, otrzymujemy wzór końcowy:
+\begin{equation*}
+    \delta^1 u_{\nu} = \frac{u_{\nu+1} - u_{\nu-1}}{2h}
+\end{equation*}
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_progresywna.png}
+    \caption{Porównanie dokładnej pochodnej analitycznej ($\cosh(x)$) z przybliżeniem numerycznym obliczonym za pomocą ilorazu różnicowego progresywnego (w przód).}
+    \label{fig:wykres_progresywna}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_regresywna.png}
+    \caption{Porównanie dokładnej pochodnej analitycznej ($\cosh(x)$) z przybliżeniem numerycznym obliczonym za pomocą ilorazu różnicowego regresywnego (wstecz).}
+    \label{fig:wykres_regresywna}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_centralna.png}
+    \caption{Porównanie dokładnej pochodnej analitycznej ($\cosh(x)$) z przybliżeniem numerycznym obliczonym za pomocą ilorazu różnicowego centralnego.}
+    \label{fig:wykres_centralna}
+\end{figure}
+
+\newpage
+
+\section{ Analiza błędu względnego}
+
+W celu ilościowej oceny dokładności zastosowanych metod numerycznych, dla każdego węzła siatki obliczono błąd względny $E$ wyrażony w procentach. Błąd ten definiuje się jako stosunek wartości bezwzględnej różnicy między pochodną dokładną (analityczną) $u'_{\nu}$, a jej przybliżeniem numerycznym $\tilde{u}'_{\nu}$, do wartości pochodnej dokładnej:
+
+\begin{equation*}
+    E = \left| \frac{u'_{\nu} - \tilde{u}'_{\nu}}{u'_{\nu}} \right| \cdot 100\%
+\end{equation*}
+
+W analizowanym przypadku funkcją bazową jest $u(x) = \sinh(x)$, zatem pochodna dokładna w powyższym wzorze przyjmuje postać $u'(x) = \cosh(x)$.
+
+Obliczenia błędu względnego przeprowadzono dla wszystkich trzech zdefiniowanych wcześniej ilorazów różnicowych. Zestawienie wyników na wspólnym wykresie pozwala zaobserwować zachowanie każdej z metod. Metoda oparta na ilorazie centralnym generuje najmniejszy błąd przybliżenia, co wynika z faktu, iż w rozwinięciu w szereg Taylora redukcji ulegają składniki rzędu $h$, przez co metoda ta jest wyższego rzędu dokładności. Z kolei błędy dla ilorazu progresywnego i regresywnego są zauważalnie większe i rosną symetrycznie w kierunku przeciwległych brzegów przedziału.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_bledy.png}
+    \caption{Porównanie błędu względnego $E$ [\%] dla ilorazów różnicowych: progresywnego, regresywnego i centralnego.}
+    \label{fig:wykres_bledy}
+\end{figure}
+\end{document}
