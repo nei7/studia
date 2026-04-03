@@ -30,7 +30,7 @@
                 amsmath
                 graphics
                 koma-script
-                babel-german
+                babel-polish
                 hyperref
                 fontawesome5
                 tcolorbox
