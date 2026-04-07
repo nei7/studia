@@ -1,7 +1,4 @@
-n = 8;
-a = -1;
-b = 1;
-h = (b - a) / (n - 1);
+
 
 x = linspace(a, b, n);
 u = sinh(x);

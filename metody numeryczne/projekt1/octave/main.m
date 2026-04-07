@@ -12,6 +12,16 @@ if ~exist(output_dir, 'dir')
     mkdir(output_dir);
 end
 
+
+n = 8;
+
+% przedziały
+a = -1;
+b = 1;
+
+% krok h
+h = (b - a) / (n - 1);
+
 krok1;       
 krok2;
 krok3;

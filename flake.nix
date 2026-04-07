@@ -1,11 +1,16 @@
 {
-  description = "Projekty";
+  description = "Studia";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    elegantnote = {
+      url = "github:ElegantLaTeX/ElegantNote/master";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, elegantnote, nixpkgs, ... }:
     let
       supportedSystems = [ 
         "x86_64-linux" 
@@ -22,19 +27,7 @@
         default = pkgs.mkShell {
           packages = [
             (pkgs.texlive.combine {
-              inherit (pkgs.texlive)
-                scheme-small
-                latexmk
-                luatex
-                biber
-                amsmath
-                graphics
-                koma-script
-                babel-polish
-                hyperref
-                fontawesome5
-                tcolorbox
-                latexindent;
+                inherit (pkgs.texlive) scheme-full;
             })
             pkgs.octaveFull
             pkgs.skim
@@ -42,6 +35,10 @@
             pkgs.ghostscript
             pkgs.gnumake
           ];
+
+          shellHook = ''
+              export TEXINPUTS=".:${elegantnote}//:"
+            '';
         };
       });
     };

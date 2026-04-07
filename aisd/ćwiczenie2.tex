@@ -1,0 +1,200 @@
+\documentclass[en, color=black, device=pad, mode=geey]{elegantnote}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+\usepackage{polski}
+
+\title{Temat 2. Złożoność obliczeniowa }
+\author{}
+\date{\today}
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    stringstyle=\color{green!50!black},
+    commentstyle=\color{gray},
+    numbers=left,
+    numberstyle=\color{gray},
+    stepnumber=1,
+    frame=single,
+    breaklines=true,
+    captionpos=b
+    showstringspaces=false, 
+    showspaces=false
+    commentstyle=\color{gray}\itshape,
+    morecomment=[l]{//},
+    literate={ą}{{\k{a}}}1 {ć}{{\'c}}1 {ę}{{\k{e}}}1 {ł}{{\l{}}}1 {ń}{{\'n}}1 {ó}{{\'o}}1 {ś}{{\'s}}1 {ź}{{\'z}}1 {ż}{{\.z}}1
+             {Ą}{{\k{A}}}1 {Ć}{{\'C}}1 {Ę}{{\k{E}}}1 {Ł}{{\L{}}}1 {Ń}{{\'N}}1 {Ó}{{\'O}}1 {Ś}{{\'S}}1 {Ź}{{\'Z}}1 {Ż}{{\.Z}}1,
+    keywordstyle=\color{blue}\bfseries,
+    morekeywords={READ, LOAD, STORE, JZERO, SUB, JGTZ, JUMP, WRITE, HALT}, 
+}
+
+\begin{document}
+
+\maketitle
+
+
+\newpage
+
+\section{Zadanie 1}
+
+\subsection{}
+Rejestry: $R_1$ będzie przechowywać bieżącą wartość $x$, $R_2$ będzie przechowywać dotychczasowe $max$. Akumulator to $R_0$.
+
+
+\begin{lstlisting}
+READ 1      // czytaj x do R1
+LOAD 1      // wczytaj x do akumulatora
+STORE 2     // max <- x (zapisz w R2)
+LOOP: LOAD 1 // wczytaj x do sprawdzania warunku pętli
+JZERO END   // jeśli x == 0, zakończ pętlę i skocz do END
+SUB 2       // Akumulator = x - max
+JGTZ UPDATE // jeśli x - max > 0 (czyli x max), skocz do UPDATE
+JUMP NEXT   // w przeciwnym razie omiń aktualizację
+UPDATE: LOAD 1 // wczytaj x
+STORE 2     // max <- x
+NEXT: READ 1 // czytaj kolejne x
+JUMP LOOP   // wróć na początek pętli
+END: WRITE 2 // wypisz max (z R2)
+HALT        // koniec programu
+\end{lstlisting}
+
+\newpage
+\subsection{Złożoność czasowa i pamięciowa: }
+
+
+Niech:
+\begin{itemize}
+    \item  $N$ - oznacza liczbę wszystkich elementów ciągu wejściowego (łącznie z kończącym go zerem).
+    \item $V$ - oznacza maksymalną wartość bezwzględną liczby w ciągu ($V = \max(|x_i|)$).
+    \item $l(x)$ - oznacza długość bitową (koszt logarytmiczny) liczby $x$, standardowo $l(x) = O(\log |x|)$.
+\end{itemize}
+
+\subsubsection{Kryterium równomierne (jednorodne)}
+W tym modelu zakładamy, że każda instrukcja wykonuje się w czasie $O(1)$, a każdy rejestr zajmuje pamięć $O(1)$, niezależnie od wielkości przechowywanych w nim liczb.
+
+\begin{itemize}
+    \item Złożoność pamięciowa, $S(N)$: Program potrzebuje zaledwie kilku rejestrów do działania niezależnie od rozmiaru danych wejściowych: akumulatora na operacje (zwykle $R_0$), rejestru na bieżącą wartość $x$ (np. $R_1$) oraz rejestru na dotychczasowe maksimum $max$ (np. $R_2$). Liczba zajmowanych komórek pamięci jest stała.
+          \begin{equation}
+              S(N) = O(1)
+          \end{equation}
+    \item Złożoność czasowa, $T(N)$: Pętla dopóki wykona się dokładnie $N-1$ razy (dla każdej liczby aż do napotkania zera). Wewnątrz pętli znajduje się stała liczba prostych instrukcji (porównanie, ewentualne przypisanie, wczytanie kolejnej liczby). Wykonanie każdej z nich kosztuje $O(1)$.
+          \begin{equation}
+              T(N) = O(N)
+          \end{equation}
+\end{itemize}
+
+
+\subsubsection{Kryterium logarytmiczne}
+W tym modelu koszt wykonania instrukcji oraz koszt przechowania wartości zależy od długości binarnej operanda. Koszt przechowania i operowania na liczbie $x$ wynosi $l(x) \approx O(\log |x|)$.
+
+\begin{itemize}
+    \item Złożoność pamięciowa, S(N): Wykorzystujemy stałą liczbę rejestrów, ale ich rozmiar zależy od tego, jak duże liczby w nich przechowujemy. Największą liczbą, jaka może znaleźć się w pamięci (w zmiennej x lub max), jest V. Koszt zapamiętania takiej liczby to O(logV).
+          \begin{equation}
+              S(N) = O(\log V)
+          \end{equation}
+    \item Złożoność czasowa, $T(N)$: Pętla wykonuje się $N-1$ razy. W każdym obrocie pętli wykonujemy operacje (np. wczytywanie READ, odejmowanie przy warunku jeśli x>max, zapisywanie STORE). W najgorszym przypadku w każdym kroku operujemy na liczbach rzędu wielkości $V$. Koszt pojedynczej operacji na takich liczbach wynosi $O(\log V)$. Sumując ten koszt dla $N$ obrotów pętli, otrzymujemy:
+          \begin{equation}
+              T(N) = O(N \log V)
+          \end{equation}
+\end{itemize}
+
+\newpage
+
+\section{Zadanie 2}
+Algorytm zlicza wystąpienia jedynek i dwójek, a na końcu - po napotkaniu zera - porównuje oba liczniki.
+
+\begin{lstlisting}
+    c1 <- 0
+    c2 <- 0
+    czytaj x
+    dopóki x != 0 wykonuj {
+        jeśli x == 1 to c1 <- c1 + 1
+        jeśli x == 2 to c2 <- c2 + 1
+        czytaj x
+    }
+    jeśli c1 == c2 to pisz 1
+\end{lstlisting}
+
+\newpage
+\subsection{Program w języku maszyny RAM}
+Przyjmuję następujące przeznaczenie rejestrów: $R_1$ - przechowuje aktualnie wczytaną wartość $x$
+$R_2$ - licznik jedynek ($c_1$)
+$R_3$ - licznik dwójek ($c_2$)
+$R_0$ - akumulator
+
+\begin{lstlisting}
+LOAD =0      // przygotuj 0 w akumulatorze
+STORE 2      // c1 = 0
+STORE 3      // c2 = 0
+LOOP: READ 1  // czytaj kolejne x do R1
+LOAD 1       // wczytaj x do akumulatora
+JZERO CHECK  // jeśli x == 0, zakończ pętlę i sprawdź liczniki
+SUB =1       // Akumulator = x - 1
+JZERO IS_ONE // jeśli wynik to 0 (czyli x == 1), skok
+LOAD 1       // wczytaj ponownie x do akumulatora
+SUB =2       // Akumulator = x - 2
+JZERO IS_TWO // jeśli wynik to 0 (czyli x == 2), skok
+JUMP LOOP // (wraca na początek jeśli to coś innego)
+IS_ONE: LOAD 2 // wczytaj licznik c1
+ADD =1       // c1 + 1
+STORE 2      // zapisz zaktualizowane c1
+JUMP LOOP    // wróć po kolejną liczbę
+IS_TWO: LOAD 3 // wczytaj licznik c2
+ADD =1       // c2 + 1
+STORE 3      // zapisz zaktualizowane c2
+JUMP LOOP    // wróć po kolejną liczbę
+CHECK: LOAD 2 // wczytaj c1
+SUB 3        // Akumulator = c1 - c2
+JZERO EQUAL  // jeśli różnica wynosi 0, są równe
+HALT         // jeśli nierówne, po prostu zatrzymaj program
+EQUAL: WRITE =1 // wypisz 1 (skoro są równe)
+HALT         // zatrzymaj program
+\end{lstlisting}
+
+\subsection{Złożoność czasowa}
+
+3. Złożoność czasowa i pamięciowa (podpunkt b)Niech $N$ oznacza całkowitą liczbę elementów podanych na wejściu (wliczając kończące zero). Kryterium równomierne (jednorodne)Zakładamy, że każda instrukcja oraz każda komórka pamięci kosztuje $O(1)$.Złożoność pamięciowa: Wykorzystujemy stałą liczbę rejestrów ($R_0, R_1, R_2, R_3$), niezależnie od długości ciągu na wejściu.$$S(N) = O(1)$$Złożoność czasowa: Pętla odczytująca wykonuje się $N$ razy. W każdej iteracji maszyna wykonuje co najwyżej kilka instrukcji (wczytanie, 1-2 porównania, dodanie do licznika, skok). Każda z nich kosztuje czas stały.$$T(N) = O(N)$$Kryterium logarytmiczneZakładamy, że koszt zależy od długości bitowej przetwarzanych i przechowywanych wartości ($l(x) \approx O(\log |x|)$).Złożoność pamięciowa: Same liczby z wejścia (0, 1, 2) zajmują mało miejsca, ale liczniki $c_1$ i $c_2$ mogą urosnąć nawet do wartości $N$ (jeśli ciąg składa się z samych jedynek albo samych dwójek). Aby przechować w rejestrze wartość $N$, potrzebujemy logarytmicznej liczby bitów.$$S(N) = O(\log N)$$Złożoność czasowa: W każdym kroku pętli wykonujemy dodawanie do licznika. Dodanie wartości 1 do licznika przechowującego w danym momencie liczbę $k$ kosztuje czas rzędu $O(\log k)$ (ponieważ musimy przetworzyć wszystkie bity tej liczby). Sumując te koszty dla wszystkich $N$ elementów, otrzymujemy ciąg sumaryczny: $\sum_{k=1}^{N} O(\log k)$. Ze wzoru Stirlinga (lub analizy matematycznej na logarytmach) wiemy, że $\log(N!) \approx N \log N$.$$T(N) = O(N \log N)$$
+
+
+\newpage
+
+\section{Napisać w pseudojęzyku algorytm wyznaczania wartości n!
+  dla podanej liczby nieujemne}
+
+Zaczynamy od napisania prostego algorytmu iteracyjnego. Przypisujemy wynikowi początkową wartość 1, a następnie w pętli mnożymy go przez kolejne wartości $n$, po czym zmniejszamy $n$ o 1, aż dojdziemy do zera.
+
+\begin{lstlisting}
+czytaj n
+silnia <- 1
+dopóki n > 0 wykonuj {
+    silnia <- silnia * n
+    n <- n - 1
+}
+pisz silnia
+\end{lstlisting}
+
+\newpage
+\subsection{Program w języku maszyny RAM}
+Przydział rejestrów:$R_1$ – przechowuje zmienną $n$$R_2$ – przechowuje aktualnie obliczoną wartość $silnia$$R_0$ – akumulator (używany domyślnie do operacji)
+
+        \begin{lstlisting}
+READ 1      // wczytaj wartość n do R1
+LOAD =1     // załaduj stałą 1 do akumulatora
+STORE 2     // silnia = 1 (zapisz początkową wartość do R2)
+LOOP: LOAD 1 // wczytaj aktualne n z R1 do akumulatora
+JZERO END   // jeśli n == 0, zakończ pętlę i przejdź do END
+MULT 2      // Akumulator = n * silnia
+STORE 2     // silnia = n * silnia (zapisz nowy wynik w R2)
+LOAD 1      // wczytaj n z R1 do akumulatora
+SUB =1      // Akumulator = n - 1
+STORE 1     // n = n - 1 (zapisz zmniejszone n w R1)
+JUMP LOOP   // wróć na początek pętli
+END: WRITE 2 // wypisz wynik (wartość z R2)
+HALT        // zatrzymaj program
+\end{lstlisting}
+
+        \newpage
+        \subsection{Złożoność czasowa i pamięciowa}
+        Kryterium równomierne (jednorodne)W tym modelu każda instrukcja oraz każda użyta komórka pamięci ma stały koszt, niezależnie od wielkości przetwarzanych liczb.Złożoność pamięciowa: Program korzysta tylko z trzech rejestrów ($R_0$, $R_1$, $R_2$). Ich liczba nie zmienia się wraz ze wzrostem $n$.$$S(n) = O(1)$$Złożoność czasowa: Pętla wykonuje się dokładnie $n$ razy. W każdym kroku pętli wykonywana jest stała liczba prostych instrukcji.$$T(n) = O(n)$$Kryterium logarytmiczneW tym modelu koszt przechowania liczby oraz operacji na niej jest proporcjonalny do jej długości bitowej, czyli zależy od wartości logarytmu z tej liczby ($l(x) = O(\log |x|)$).Złożoność pamięciowa: W rejestrze $R_2$ na samym końcu przechowywana jest wartość $n!$. Ze wzoru Stirlinga wiemy, że długość zapisu binarnego liczby $n!$ wynosi w przybliżeniu $n \log n$. Zatem liczba bitów (pamięć) potrzebna do jej zapisania rośnie nieliniowo.$$S(n) = O(n \log n)$$Złożoność czasowa: W $i$-tym kroku pętli maszyna wykonuje mnożenie (instrukcja MULT) liczby $i$ (o długości $O(\log i)$) przez dotychczasowy iloczyn $i!$ (o długości $O(i \log i)$). Koszt takiej instrukcji w modelu logarytmicznym to suma długości bitowych argumentów, czyli $O(i \log i)$. Aby obliczyć całkowity czas, musimy zsumować ten koszt dla wszystkich $n$ kroków pętli:$$T(n) = \sum_{i=1}^{n} O(i \log i)$$Z własności sumowania ciągów otrzymujemy ostateczną złożoność:$$T(n) = O(n^2 \log n)$$
+\end{document}

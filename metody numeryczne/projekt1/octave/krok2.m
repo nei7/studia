@@ -1,9 +1,9 @@
 
-x_ciagle = linspace(-1, 1, 100);
+x_ciagle = linspace(a, b, 100);
 u_ciagle = sinh(x_ciagle);
 
-n = 8;
-x_wezly = linspace(-1, 1, n);
+
+x_wezly = linspace(a, b, n);
 u_wezly = sinh(x_wezly);
 
 figure(1, 'visible', 'off');

@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "elegantnote": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772374818,
+        "narHash": "sha256-3d+3BY8FtkzgsJB2Zu6DnE2Tl6xwep3obH7a6QM8U8M=",
+        "owner": "ElegantLaTeX",
+        "repo": "ElegantNote",
+        "rev": "b2862a06335a83aa6ac38a73893ab2a519e108cb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ElegantLaTeX",
+        "ref": "master",
+        "repo": "ElegantNote",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1775036866,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "elegantnote": "elegantnote",
         "nixpkgs": "nixpkgs"
       }
     }
