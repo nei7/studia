@@ -10,36 +10,51 @@
     };
   };
 
-  outputs = { self, elegantnote, nixpkgs, ... }:
+  outputs =
+    {
+      self,
+      elegantnote,
+      nixpkgs,
+      ...
+    }:
     let
-      supportedSystems = [ 
-        "x86_64-linux" 
-        "aarch64-linux" 
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
       ];
-      
-      forEachSupportedSystem = f:
-        nixpkgs.lib.genAttrs supportedSystems
-          (system: f {
-            pkgs = import nixpkgs { inherit system; };
-          });
-    in {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShell {
-          packages = [
-            (pkgs.texlive.combine {
-                inherit (pkgs.texlive) scheme-full;
-            })
-            pkgs.octaveFull
-            pkgs.skim
-            pkgs.git
-            pkgs.ghostscript
-            pkgs.gnumake
-          ];
 
-          shellHook = ''
+      forEachSupportedSystem =
+        f:
+        nixpkgs.lib.genAttrs supportedSystems (
+          system:
+          f {
+            pkgs = import nixpkgs { inherit system; };
+          }
+        );
+    in
+    {
+      devShells = forEachSupportedSystem (
+        { pkgs }:
+        {
+          default = pkgs.mkShell {
+            packages = [
+              (pkgs.texlive.combine {
+                inherit (pkgs.texlive)
+                  scheme-full
+                  ;
+              })
+              pkgs.octaveFull
+              pkgs.skim
+              pkgs.git
+              pkgs.ghostscript
+              pkgs.gnumake
+            ];
+
+            shellHook = ''
               export TEXINPUTS=".:${elegantnote}//:"
             '';
-        };
-      });
+          };
+        }
+      );
     };
 }

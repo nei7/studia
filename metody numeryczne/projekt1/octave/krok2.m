@@ -1,7 +1,5 @@
-
 x_ciagle = linspace(a, b, 100);
 u_ciagle = sinh(x_ciagle);
-
 
 x_wezly = linspace(a, b, n);
 u_wezly = sinh(x_wezly);
@@ -15,6 +13,8 @@ plot(x_ciagle, u_ciagle, 'b-', 'LineWidth', 2);
 
 plot([-1.2 1.2], [0 0], 'k-', 'LineWidth', 1.5);
 
+set(gca, 'FontSize', 20);
+
 for i = 1:n
     plot([x_wezly(i) x_wezly(i)], [0 u_wezly(i)], 'k--', 'LineWidth', 1); 
 
@@ -22,20 +22,20 @@ for i = 1:n
     
     plot(x_wezly(i), u_wezly(i), 'bo', 'MarkerFaceColor', 'b', 'MarkerSize', 6);
     
-
-    text(x_wezly(i), -0.18, sprintf('x_%d', i), 'HorizontalAlignment', 'center', 'FontSize', 12);
+    text(x_wezly(i), -0.18, sprintf('x_%d', i), 'HorizontalAlignment', 'center', 'FontSize', 20);
     
-
+    % Zwiększono FontSize z 12 na 14 dla wartości u(x)
     if u_wezly(i) >= 0
-        text(x_wezly(i)+0.03, u_wezly(i) + 0.15, sprintf('u_%d', i), 'HorizontalAlignment', 'left', 'Color', 'b', 'FontSize', 12);
+        text(x_wezly(i)+0.03, u_wezly(i) + 0.15, sprintf('u_%d', i), 'HorizontalAlignment', 'left', 'Color', 'b', 'FontSize', 20);
     else
-        text(x_wezly(i)+0.03, u_wezly(i) - 0.15, sprintf('u_%d', i), 'HorizontalAlignment', 'left', 'Color', 'b', 'FontSize', 12);
+        text(x_wezly(i)+0.03, u_wezly(i) - 0.15, sprintf('u_%d', i), 'HorizontalAlignment', 'left', 'Color', 'b', 'FontSize', 20);
     end
 end
 
-title(sprintf('Wykres u(x) = sinh(x) oraz węzłów dyskretyzacji (n=%d)', n));
-xlabel('x');
-ylabel('u(x)');
+% Powiększenie czcionki w tytule i na etykietach osi
+title(sprintf('Wykres u(x) = sinh(x) oraz węzłów dyskretyzacji (n=%d)', n), 'FontSize', 20);
+xlabel('x', 'FontSize', 20);
+ylabel('u(x)', 'FontSize', 20);
 xlim([-1.2 1.2]);
 ylim([-1.6 1.6]);
 hold off;

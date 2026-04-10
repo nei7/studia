@@ -1,4 +1,3 @@
-
 a = -1;
 b = 1;
 h = (b - a) / (n - 1);
@@ -32,9 +31,14 @@ plot(x, E_prog, 'r-o', 'LineWidth', 2, 'MarkerSize', 6, 'MarkerFaceColor', 'r', 
 plot(x, E_regr, 'b-s', 'LineWidth', 2, 'MarkerSize', 6, 'MarkerFaceColor', 'b', 'DisplayName', 'Bład - Regresywna');
 plot(x, E_cent, 'g-^', 'LineWidth', 2, 'MarkerSize', 6, 'MarkerFaceColor', 'g', 'DisplayName', 'Bład - Centralna');
 
-title('Blad wzgledny E [%] przyblizen pochodnej');
-xlabel('x'); ylabel('E [%]');
-legend('Location', 'north');
+% Powiększenie czcionki na podziałkach osi do 20
+set(gca, 'FontSize', 20);
+
+% Powiększenie czcionki do 20 w tytule, etykietach i legendzie
+title('Blad wzgledny E [%] przyblizen pochodnej', 'FontSize', 20);
+xlabel('x', 'FontSize', 20); 
+ylabel('E [%]', 'FontSize', 20);
+legend('Location', 'north', 'FontSize', 20);
 xlim([-1.2 1.2]);
 
 

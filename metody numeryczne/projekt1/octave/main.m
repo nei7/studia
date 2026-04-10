@@ -26,6 +26,7 @@ krok1;
 krok2;
 krok3;
 krok4;
+krok4_2;
 
 disp(['Working directory: ', pwd]);
 disp(['Assets directory: ', output_dir]);
