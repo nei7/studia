@@ -1,0 +1,219 @@
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[polish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{polish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+
+% Add because main language is not English
+\usepackage{enumitem}
+\setlist[itemize]{label=-}
+
+% --- DODATKOWE PAKIETY ---
+\usepackage{amsmath}
+\usepackage{circuitikz}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\title{\Huge \textbf{Tranzystor Bipolarny w Pigułce}}
+\author{Notatka Teoretyczna do Zadań}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. Czym jest tranzystor bipolarny (BJT)? - Prosta Analogia}
+Tranzystor to element półprzewodnikowy o trzech końcówkach: \textbf{Baza (B)}, \textbf{Kolektor (C)} i \textbf{Emiter (E)}.
+
+Najlepiej wyobrazić sobie tranzystor jako \textbf{zawór hydrauliczny}:
+\begin{itemize}
+    \item \textbf{Kolektor i Emiter} to główna rura, przez którą płynie woda (Główny prąd $I_C$).
+    \item \textbf{Baza} to pokrętło tego zaworu.
+    \item Puszczając bardzo mały strumień wody przez pokrętło (mały prąd bazy $I_B$), otwieramy główny zawór i pozwalamy na przepływ potężnego strumienia wody (duży prąd kolektora $I_C$).
+\end{itemize}
+Wniosek: \textbf{Tranzystor bipolarny steruje dużym prądem wyjściowym za pomocą małego prądu wejściowego.}
+
+\section*{2. Podstawowe wzory i parametry}
+W zadaniach najczęściej spotkasz tranzystor typu \textbf{NPN}. Zawsze obowiązują dla niego podstawowe prawa Kirchhoffa i relacje prądowe:
+
+\begin{equation}
+    I_E = I_C + I_B
+\end{equation}
+\begin{equation}
+    I_C = \beta \cdot I_B
+\end{equation}
+\begin{equation}
+    \alpha = \frac{I_C}{I_E} \quad \implies \quad \beta = \frac{\alpha}{1 - \alpha}
+\end{equation}
+
+\textbf{Gdzie:}
+\begin{itemize}
+    \item $I_B$ - prąd bazy (bardzo mały, rzędu $\mu A$)
+    \item $I_C$ - prąd kolektora (duży, rzędu $mA$)
+    \item $I_E$ - prąd emitera ($I_E \approx I_C$, ponieważ $I_B$ jest znikomy)
+    \item $\beta$ (często oznaczane jako $h_{FE}$) - \textbf{współczynnik wzmocnienia prądowego}. Zazwyczaj wynosi od 50 do 300.
+    \item $\alpha$ - wzmocnienie prądowe w układzie wspólnej bazy (zawsze nieco mniejsze od 1, np. 0.99).
+\end{itemize}
+
+\section*{3. Trzy Stany Pracy Tranzystora (Klucz do zadań!)}
+Aby rozwiązać zadanie i wyznaczyć punkt pracy, musisz wiedzieć, w jakim trybie pracuje tranzystor. Zależy to od napięć na jego złączach.
+
+\begin{center}
+    \begin{tabular}{lp{5cm}p{7cm}}
+        \toprule
+        \textbf{Stan pracy}                & \textbf{Warunki}                                                                                                                 & \textbf{Analogia zaworu}                                                                                                                                                                \\
+        \midrule
+        \textbf{1. Zatkania} (Cut-off)     & $U_{BE} < 0.7\text{ V}$ \newline $I_B = 0$ \newline $I_C = 0$                                                                    & Zawór całkowicie zakręcony. Woda nie płynie. Tranzystor działa jak przerwa w obwodzie.                                                                                                  \\
+        \midrule
+        \textbf{2. Aktywny} (Active)       & $U_{BE} \approx 0.7\text{ V}$ \newline $U_{CE} > 0.2\text{ V}$ \newline $\mathbf{I_C = \beta \cdot I_B}$                         & Zawór częściowo odkręcony. Przepływ głównej wody jest idealnie proporcjonalny do tego, jak mocno odkręcamy. \textbf{Tylko tutaj tranzystor wzmacnia sygnał!}                            \\
+        \midrule
+        \textbf{3. Nasycenia} (Saturation) & $U_{BE} \approx 0.7\text{ V}$ \newline $\mathbf{U_{CE} \approx U_{CEsat} \approx 0.2\text{ V}}$ \newline $I_C < \beta \cdot I_B$ & Zawór odkręcony na maksa. Wody leci tyle, ile pozwala rura (rezystor w obwodzie), kręcenie pokrętłem bardziej (zwiększanie $I_B$) już nic nie daje. Napięcie $U_{CE}$ spada do minimum. \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\vspace{0.5cm}
+
+\section*{4. Wyznaczanie Punktu Pracy - Algorytm Krok po Kroku}
+Punkt pracy (punkt $Q$) to para wartości: \textbf{Prąd kolektora ($I_C$)} oraz \textbf{Napięcie kolektor-emiter ($U_{CE}$)} przy braku sygnału zmiennego (tylko zasilanie stałe DC).
+
+Przeanalizujmy to na podstawowym schemacie układu Wspólnego Emitera (WE):
+
+\begin{center}
+    \begin{circuitikz}[european, scale=1.2]
+        % Tranzystor
+        \draw (0,0) node[npn] (T) {T};
+
+        % Emiter do masy
+        \draw (T.E) node[ground] {};
+
+        % Obwód wyjściowy (Kolektor)
+        \draw (T.C) to[R, l=$R_C$, i<=$I_C$] (0,3) node[ocirc]{} node[above]{$U_{CC}$};
+
+        % Obwód wejściowy (Baza)
+        \draw (T.B) to[R, l_=$R_B$, i<=$I_B$] (-3,0) node[ocirc]{} node[left]{$U_{BB}$ (lub zasilanie wej.)};
+
+        % Strzałki napięć
+        \draw[-stealth, thick, blue] (T.B) ++(-0.2,-0.4) to[bend right] node[below left] {$U_{BE}=0.7V$} (T.E);
+        \draw[-stealth, thick, red] (T.C) ++(0.3,-0.2) to[bend left] node[right] {$U_{CE}$} (T.E);
+    \end{circuitikz}
+\end{center}
+
+\subsection*{KROK 1: Obliczenie prądu Bazy ($I_B$) z Oczka Wejściowego}
+Piszemy równanie Napięciowego Prawa Kirchhoffa (II prawo Kirchhoffa) dla lewej części obwodu (od zasilania $U_{BB}$ przez bazę do emitera i masy):
+\begin{equation}
+    U_{BB} - I_B \cdot R_B - U_{BE} = 0
+\end{equation}
+Przekształcamy to, aby obliczyć $I_B$:
+\begin{equation}
+    I_B = \frac{U_{BB} - U_{BE}}{R_B}
+\end{equation}
+\textit{Uwaga: Pamiętaj, że dla krzemu zawsze zakładamy $U_{BE} = 0.7\text{ V}$. Jeśli wyjdzie $I_B \le 0$, tranzystor jest w stanie ZATKANIA ($I_C = 0, U_{CE} = U_{CC}$).}
+
+\subsection*{KROK 2: Założenie stanu Aktywnego i obliczenie $I_C$}
+Jeśli $I_B > 0$, na początek \textbf{zakładamy}, że tranzystor pracuje w stanie aktywnym. Możemy wtedy użyć wzoru na wzmocnienie:
+\begin{equation}
+    I_C = \beta \cdot I_B
+\end{equation}
+
+\subsection*{KROK 3: Obliczenie $U_{CE}$ z Oczka Wyjściowego (Sprawdzenie Nasycenia)}
+Teraz piszemy równanie dla prawej strony obwodu (od zasilania $U_{CC}$ przez kolektor do emitera i masy):
+\begin{equation}
+    U_{CC} - I_C \cdot R_C - U_{CE} = 0
+\end{equation}
+Wyznaczamy z tego napięcie $U_{CE}$:
+\begin{equation}
+    U_{CE} = U_{CC} - I_C \cdot R_C
+\end{equation}
+
+\subsection*{KROK 4: Weryfikacja stanu (KRYTYCZNE!)}
+Otrzymany wynik $U_{CE}$ musisz ocenić:
+\begin{itemize}
+    \item \textbf{Jeśli $U_{CE} > 0.2\text{ V}$:} Nasze założenie było prawidłowe! Tranzystor jest w \textbf{stanie aktywnym}. Punkt pracy to wyliczone wcześniej $I_C$ oraz $U_{CE}$. Koniec zadania.
+    \item \textbf{Jeśli wyjdzie bzdura, np. $U_{CE} < 0.2\text{ V}$ (lub wynik ujemny):} Znaczy to, że tranzystor "chciałby" przepuścić więcej prądu, ale zasilanie i rezystor na to nie pozwalają. Tranzystor jest w \textbf{nasyceniu}.
+
+          Wtedy odrzucamy wyliczone $I_C$ oraz $U_{CE}$. Podstawiamy z góry:
+          \begin{equation}
+              U_{CE} = U_{CEsat} = 0.2\text{ V}
+          \end{equation}
+          I prąd kolektora obliczamy na nowo, wyciągając go z oczka wyjściowego:
+          \begin{equation}
+              I_{Csat} = \frac{U_{CC} - 0.2\text{ V}}{R_C}
+          \end{equation}
+\end{itemize}
+
+
+\section*{5. Prosta Pracy (Charakterystyka obciążenia)}
+W zadaniach często proszą o narysowanie prostej pracy na charakterystyce wyjściowej $I_C(U_{CE})$. Jest to graficzne przedstawienie równania oczka wyjściowego:
+$I_C = -\frac{1}{R_C} \cdot U_{CE} + \frac{U_{CC}}{R_C}$
+
+Aby ją narysować, potrzebujesz tylko 2 punktów skrajnych na osiach wykresu:
+\begin{enumerate}
+    \item \textbf{Zatkanie (punkt na osi X):} Wyobraź sobie, że $I_C = 0$. Wtedy napięcie nie odkłada się na oporniku, całe jest na tranzystorze. Punkt to: $U_{CE} = U_{CC}$.
+    \item \textbf{Zwarcie/Pełne Nasycenie (punkt na osi Y):} Wyobraź sobie, że $U_{CE} = 0$. Wtedy cały prąd zależy od prawa Ohma dla opornika. Punkt to: $I_C = \frac{U_{CC}}{R_C}$.
+\end{enumerate}
+
+Na tej prostej leży Twój punkt pracy (Q), który wyliczyłeś w poprzednim kroku.
+
+\begin{center}
+    \begin{tikzpicture}[scale=1.5]
+        % Osie
+        \draw[->, thick] (0,0) -- (6,0) node[right] {$U_{CE} \text{ [V]}$};
+        \draw[->, thick] (0,0) -- (0,4) node[above] {$I_C \text{ [mA]}$};
+
+        % Prosta pracy
+        \draw[thick, blue] (0, 3) node[left] {$\frac{U_{CC}}{R_C}$} -- (4, 0) node[below] {$U_{CC}$};
+
+        % Punkt Q
+        \filldraw[red] (2.5, 1.125) circle (2pt) node[above right] {Punkt Pracy $Q(U_{CE}, I_C)$};
+
+        % Linie przerywane do osi
+        \draw[dashed, red] (2.5, 0) node[below] {$U_{CE_Q}$} -- (2.5, 1.125);
+        \draw[dashed, red] (0, 1.125) node[left] {$I_{C_Q}$} -- (2.5, 1.125);
+
+        % Obszar nasycenia i zatkania
+        \draw[dashed, gray] (0.4, 0) -- (0.4, 4);
+        \node[gray, align=center] at (0.2, 2) {\small Nasycenie \\ \small ($U_{CE}<0.2V$)};
+    \end{tikzpicture}
+\end{center}
+
+
+\section*{6. Model Małosygnałowy (Hybryd-$\pi$) - Do sygnałów zmiennych (AC)}
+Gdy podłączymy do tranzystora sygnał zmienny (np. z mikrofonu), tranzystor zachowuje się inaczej - zaczyna go wzmacniać. W analizie takich układów kondensatory traktujemy jako zwarcia, zasilanie stałe ($U_{CC}$) zwieramy do masy i stosujemy schemat zastępczy tranzystora.
+
+Model Hybryd-$\pi$ (w zakresie średnich częstotliwości) dla tranzystora NPN upraszcza się do:
+
+\begin{center}
+    \begin{circuitikz}[european, scale=1.3]
+        % Węzły wejściowe
+        \draw (0,0) node[left] {B (Baza)} to[short, o-] (1,0);
+        \draw (1,0) to[R, l=$r_{b'e}$, v=$u_{be}$] (1,-2.5);
+        \draw (0,-2.5) node[left] {E (Emiter)} to[short, o-] (5,-2.5) node[right] {E (Emiter)};
+
+        % Węzeł wyjściowy
+        \draw (4,0) node[right] {C (Kolektor)} to[short, o-] (4,0);
+        \draw (4,0) to[cisource, l=$g_m \cdot u_{be}$] (4,-2.5);
+
+        % Oporność wyjściowa (opcjonalnie)
+        \draw (5,0) to[R, l=$r_{ce} \approx \frac{1}{g_{ce}}$] (5,-2.5);
+        \draw (4,0) -- (5,0);
+    \end{circuitikz}
+\end{center}
+
+\textbf{Najważniejsze parametry z tego modelu:}
+\begin{itemize}
+    \item \textbf{$u_{be}$} - wejściowe napięcie zmienne między bazą a emiterem.
+    \item \textbf{$g_m$} - transkonduktancja. Mówi o tym, jak mocno napięcie wejściowe steruje prądem wyjściowym. Wzór: $g_m = \frac{I_{C_Q}}{V_T}$, gdzie $I_{C_Q}$ to nasz stały prąd punktu pracy, a $V_T \approx 26\text{ mV}$ (potencjał termiczny w temperaturze pokojowej).
+    \item \textbf{$r_{b'e}$} (często oznaczane też jako $h_{ie}$) - dynamiczna rezystancja wejściowa. Wzór: $r_{b'e} = \frac{\beta}{g_m}$.
+    \item Źródło prądowe $g_m \cdot u_{be}$ to serce wzmacniacza - generuje ono duży prąd zmienny proporcjonalnie do małego wejściowego napięcia.
+\end{itemize}
+
+\end{document}
