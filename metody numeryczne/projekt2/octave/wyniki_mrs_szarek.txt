@@ -1,0 +1,15 @@
+=========================================================
+RAPORT Z OBLICZEN NUMERYCZNYCH - METODA ROZNIC SKONCZONYCH
+AUTOR: FRANCISZEK SZAREK, GRUPA 12
+=========================================================
+
+WYNIKI KONCOWE (Wartosci u w wezlach):
+Wezel      Wspolrzedna x   Wartosc u(x)   
+---------------------------------------------
+x_1        0.0000          6.0541         
+x_2        0.1667          6.8875         
+x_3        0.3333          7.5295         
+x_4        0.5000          7.9624         
+x_5        0.6667          8.1740         
+x_6        0.8333          8.1587         
+x_7        1.0000          8.0000         

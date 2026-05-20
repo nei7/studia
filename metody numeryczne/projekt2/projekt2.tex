@@ -1,0 +1,166 @@
+\documentclass[a4paper,14pt]{scrartcl}
+\usepackage{../main}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+
+\title{Numeryczne wyznaczanie pochodnej funkcji oraz analiza błędu przybliżenia}
+\author{Franciszek Szarek}
+\nrprojektu{2} 
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+
+\section{Wstęp teoretyczny i sformułowanie problemu}
+Przedmiotem projektu jest numeryczne rozwiązanie jednowymiarowego równania różniczkowego drugiego rzędu (równania typu Helmholtza) przy użyciu \textbf{Metody Różnic Skończonych (MRS)}. Równanie wyjściowe zapisane za pomocą operatora Laplace'a ($\Delta$) ma postać:
+\begin{equation}
+    \Delta u + k^2 u = f
+\end{equation}
+W przypadku jednowymiarowym (przestrzeń $1\text{D}$ wzdłuż osi $x$), operator Laplace'a sprowadza się do drugiej pochodnej cząstkowej po współrzędnej przestrzennej. Stosując klasyczny zapis matematyczny, równanie przyjmuje formę:
+\begin{equation}
+    \frac{d^2u}{dx^2} + k^2 u = f
+\end{equation}
+gdzie:
+\begin{itemize}
+    \item $u = u(x)$ jest poszukiwaną funkcją ciągłą,
+    \item $k$ jest stałym współczynnikiem charakterystycznym dla danego zagadnienia fizycznego,Z
+    \item $f$ reprezentuje funkcję wymuszenia zewnętrznego (źródła).
+\end{itemize}
+
+Równanie różniczkowe drugiego rzędu wymaga do jednoznacznego rozwiązania określenia dwóch warunków brzegowych (na początku i na końcu rozważanego przedziału przestrzennego $\Omega = [x_1, x_7]$). Zgodnie z zasadami teorii równań różniczkowych, warunki te mogą określać wartość samej funkcji (warunek Dirichleta) lub wartość jej pierwszej pochodnej (warunek Neumanna).
+
+\section{Dyskretyzacja obszaru i szereg Taylora}
+Metoda Różnic Skończonych polega na zastąpieniu dziedziny ciągłej dziedziną dyskretną, składającą się ze skończonej liczby punktów zwanych \textbf{węzłami siatki}. W rozpatrywanym zadaniu dziedzina została podzielona na $N = 7$ równoodległych węzłów oznaczonych jako
+\\
+$x_1, x_2, x_3, x_4, x_5, x_6, x_7$.
+Odległość między sąsiednimi węzłami nazywana jest krokiem siatki i oznaczana symbolem $h$:
+\begin{equation}
+    h = \frac{x_7 - x_1}{N - 1}
+\end{equation}
+
+Aby zastąpić operator ciągły $\frac{d^2u}{dx^2}$ jego dyskretnym odpowiednikiem algebraicznym, wykorzystujemy rozwinięcie funkcji $u(x)$ w \textbf{szereg Taylora} wokół dowolnego węzła wewnętrznego $x_i$ (gdzie indeks $i$ odpowiada bieżącemu węzłowi):
+1. Rozwinięcie ,,w przód'' (dla węzła $x_{i+1} = x_i + h$):
+\begin{equation}
+    u(x_i + h) = u(x_i) + \frac{h}{1!}u'(x_i) + \frac{h^2}{2!}u''(x_i) + \frac{h^3}{3!}u'''(x_i) + \dots
+\end{equation}
+Co w zapisie indeksowym przyjmuje postać:
+\begin{equation}
+    u_{i+1} = u_i + h u'_i + \frac{h^2}{2} u''_i + \frac{h^3}{6} u'''_i + \dots
+\end{equation}
+
+2. Rozwinięcie ,,w tył'' (dla węzła $x_{i-1} = x_i - h$):
+\begin{equation}
+    u(x_i - h) = u(x_i) - \frac{h}{1!}u'(x_i) + \frac{h^2}{2!}u''(x_i) - \frac{h^3}{3!}u'''(x_i) + \dots
+\end{equation}
+W zapisie indeksowym:
+\begin{equation}
+    u_{i-1} = u_i - h u'_i + \frac{h^2}{2} u''_i - \frac{h^3}{6} u'''_i + \dots
+\end{equation}
+
+Dodając stronami powyższe dwa równania (wzory 5 oraz 7), wyrażenia zawierające nieparzyste pochodne ($u'_i, u'''_i$) redukują się:
+\begin{equation}
+    u_{i+1} + u_{i-1} = 2u_i + h^2 u''_i + O(h^4)
+\end{equation}
+Po przekształceniu i zaniedbaniu wyrazów wyższych rzędów $O(h^4)$ otrzymujemy wzór na \textbf{centralny iloraz różnicowy drugiej pochodnej}, cechujący się dokładnością rzędu drugiego $O(h^2)$:
+\begin{equation}
+    u''_i \approx \frac{u_{i+1} - 2u_i + u_{i-1}}{h^2}
+\end{equation}
+
+Podstawiając ten wzór do naszego głównego równania różniczkowego dla węzła wewnętrznego, uzyskujemy równanie algebraiczne:
+\begin{equation}
+    \frac{u_{i+1} - 2u_i + u_{i-1}}{h^2} + k^2 u_i = f_i
+\end{equation}
+Mnożąc obustronnie przez $h^2$, otrzymujemy ostateczną postać dyskretną dla węzłów wewnętrznych:
+\begin{equation}
+    u_{i-1} + (k^2h^2 - 2)u_i + u_{i+1} = f_i h^2
+\end{equation}
+
+\section{Warunki brzegowe}
+Zgodnie z wytycznymi z zajęć laboratoryjnych, równanie algebraiczne obowiązuje wyłącznie wewnątrz dziedziny (dla węzłów od $x_2$ do $x_6$). Punkty brzegowe podlegają osobnym definicjom wynikającym z fizyki problemu:
+
+\subsection{Lewy brzeg ($x_1$) -- Warunek Neumanna}
+Na lewym brzegu zadany jest warunek Neumanna reprezentujący wartość pierwszej pochodnej funkcji: $\frac{du}{dx} = 5$. Zgodnie z decyzją dydaktyczną prowadzącego, zamiast zaawansowanej aproksymacji z węzłem fikcyjnym, zastosowano prosty \textbf{iloraz różnicowy pierwszego rzędu progresywny (w przód)}:
+\begin{equation}
+    \frac{u_2 - u_1}{h} = 5
+\end{equation}
+Po uwolnieniu mianownika i uporządkowaniu zmiennych otrzymujemy pierwsze równanie naszego układu:
+\begin{equation}
+    -1 \cdot u_1 + 1 \cdot u_2 = 5h
+\end{equation}
+
+\subsection{Prawy brzeg ($x_7$) -- Warunek Dirichleta}
+Na prawym brzegu zadana jest konkretna, sztywna wartość funkcji (warunek Dirichleta): $u_7 = 8$. Zapisujemy to bezpośrednio jako ostatnie równanie układu:
+\begin{equation}
+    1 \cdot u_7 = 8
+\end{equation}
+
+\section{Konstrukcja układu równań liniowych ($A \cdot u = b$)}
+Zgodnie z transkrypcją wykładu, funkcja wymuszenia $f = 3$ nie działa na całej dziedzinie, lecz stanowi impuls skupiony wyłącznie w \textbf{węźle szóstym} ($i=6$). W pozostałych węzłach wewnętrznych ($i=2,3,4,5$) wartość wymuszenia wynosi $0$.
+
+Składając wszystkie równania w całość dla $N=7$ węzłów, otrzymujemy następujący liniowy układ równań algebraicznych:
+\begin{align*}
+    \text{Węzeł 1 (Neumann):} \quad        & -u_1 + u_2 = 5h                    \\
+    \text{Węzeł 2 (Wewnętrzny):} \quad     & u_1 + (k^2h^2 - 2)u_2 + u_3 = 0    \\
+    \text{Węzeł 3 (Wewnętrzny):} \quad     & u_2 + (k^2h^2 - 2)u_3 + u_4 = 0    \\
+    \text{Węzeł 4 (Wewnętrzny):} \quad     & u_3 + (k^2h^2 - 2)u_4 + u_5 = 0    \\
+    \text{Węzeł 5 (Wewnętrzny):} \quad     & u_4 + (k^2h^2 - 2)u_5 + u_6 = 0    \\
+    \text{Węzeł 6 (Wewnętrzny z f):} \quad & u_5 + (k^2h^2 - 2)u_6 + u_7 = 3h^2 \\
+    \text{Węzeł 7 (Dirichlet):} \quad      & u_7 = 8
+\end{align*}
+
+W zapisie macierzowym $A \cdot u = b$ układ ten prezentuje się w pełnej okazałości następująco:
+\begin{equation}
+    \begin{bmatrix}
+        -1 & 1          & 0          & 0          & 0          & 0          & 0 \\
+        1  & (k^2h^2-2) & 1          & 0          & 0          & 0          & 0 \\
+        0  & 1          & (k^2h^2-2) & 1          & 0          & 0          & 0 \\
+        0  & 0          & 1          & (k^2h^2-2) & 1          & 0          & 0 \\
+        0  & 0          & 0          & 1          & (k^2h^2-2) & 1          & 0 \\
+        0  & 0          & 0          & 0          & 1          & (k^2h^2-2) & 1 \\
+        0  & 0          & 0          & 0          & 0          & 0          & 1
+    \end{bmatrix}
+    \cdot
+    \begin{bmatrix}
+        u_1 \\ u_2 \\ u_3 \\ u_4 \\ u_5 \\ u_6 \\ u_7
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        5h \\ 0 \\ 0 \\ 0 \\ 0 \\ 3h^2 \\ 8
+    \end{bmatrix}
+\end{equation}
+
+\section{Metoda rozwiązania -- Odwracanie macierzy}
+Prowadzący projekt położył szczególny nacisk na mechaniczną i teoretyczną znajomość metody odwracania macierzy. Zapis formalny rozwiązania algebraicznego to:
+\begin{equation}
+    u = A^{-1} \cdot b
+\end{equation}
+
+Podczas obrony projektu należy pamiętać o teorii algebry liniowej. Macierz odwrotną $A^{-1}$ dla macierzy kwadratowej $A$ definiuje się tak, że ich iloczyn daje macierz jednostkową $I$:
+\begin{equation}
+    A \cdot A^{-1} = A^{-1} \cdot A = I
+\end{equation}
+Macierz $A$ posiada macierz odwrotną wtedy i tylko wtedy, gdy jej wyznacznik jest różny od zera ($\det(A) \neq 0$).
+
+\subsection{Teoretyczne metody wyznaczania macierzy odwrotnej}
+Na potrzeby pytań kontrolnych warto opanować dwie klasyczne metody wyznaczania $A^{-1}$:
+\begin{enumerate}
+    \item \textbf{Metoda Gaussa-Jordana (operacji elementarnych):} Polega na utworzeniu macierzy blokowej $[A | I]$ o wymiarach $N \times 2N$, gdzie po prawej stronie znajduje się macierz jednostkowa. Następnie za pomocą operacji elementarnych na wierszach (mnożenie wiersza przez stałą, dodawanie wierszy, zamiana wierszy) dąży się do przekształcenia lewego bloku w macierz jednostkową. Gdy cel zostanie osiągnięty, prawy blok automatycznie staje się macierzą odwrotną $[I | A^{-1}]$.
+    \item \textbf{Metoda dopełnień algebraicznych:} Wykorzystuje wzór:
+          \begin{equation}
+              A^{-1} = \frac{1}{\det(A)} \cdot (A^D)^T
+          \end{equation}
+          gdzie $(A^D)^T$ to transponowana macierz dopełnień algebraicznych elementów macierzy $A$. Dopełnienie algebraiczne $M_{ij}$ elementu $a_{ij}$ to wyznacznik podmacierzy powstałej po wykreśleniu $i$-tego wiersza i $j$-tej kolumny, pomnożony przez $(-1)^{i+j}$.
+\end{enumerate}
+
+W środowisku Octave operacja ta realizowana jest numerycznie za pomocą wbudowanej, stabilnej funkcji \texttt{inv(A)}, co zostało przedstawione w dołączonym skrypcie programistycznym. Wyznaczenie wektora poszukiwanych wartości $u$ polega na wektorowym pomnożeniu wyznaczonej macierzy odwrotnej przez wektor prawych stron. Wynikowy dyskretny zbiór punktów stanowi numeryczne rozwiązanie zadanego problemu różniczkowego.
+
+
+\end{document}
